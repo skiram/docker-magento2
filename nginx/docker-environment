@@ -1,0 +1,11 @@
+#!/bin/sh
+
+VHOST_FILE="/etc/nginx/conf.d/default.conf"
+
+[ ! -z "${FPM_HOST}" ] && sed -i "s/!FPM_HOST!/${FPM_HOST}/" $VHOST_FILE
+[ ! -z "${FPM_PORT}" ] && sed -i "s/!FPM_PORT!/${FPM_PORT}/" $VHOST_FILE
+[ ! -z "${APP_ROOT}" ] && sed -i "s#!APP_ROOT!#${APP_ROOT}#" $VHOST_FILE
+
+nginx -t
+
+exec "$@"

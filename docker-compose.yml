@@ -1,0 +1,15 @@
+version: '2'
+services:
+  fpm:
+    build: ./fpm
+    user: docker
+    volumes:
+      - .:/var/www/html
+  nginx:
+    build: ./nginx
+    volumes:
+      - .:/var/www/html
+    links:
+      - fpm
+    ports:
+      - 8080:80
