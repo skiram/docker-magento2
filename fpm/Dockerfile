@@ -30,7 +30,7 @@ RUN docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr --with-
     && docker-php-ext-install intl mcrypt gd opcache pdo pdo_mysql zip soap mbstring xsl
 
 RUN useradd docker \
-    && mkdir /home/docker \
-    && chown docker:docker /home/docker
+    && mkdir -p /home/docker/.composer \
+    && chown -R docker:docker /home/docker
 
 WORKDIR /var/www/html
