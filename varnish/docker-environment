@@ -1,0 +1,9 @@
+#!/bin/sh
+
+VCL_FILE="/etc/varnish/default.vcl"
+
+[ ! -z "${BACKEND_HOST}" ] && sed -i "s/!BACKEND_HOST!/${BACKEND_HOST}/" $VCL_FILE
+[ ! -z "${BACKEND_PORT}" ] && sed -i "s/!BACKEND_PORT!/${BACKEND_PORT}/" $VCL_FILE
+[ ! -z "${ACL_PURGE}" ] && sed -i "s/!ACL_PURGE!/${ACL_PURGE}/" $VCL_FILE
+
+exec "$@"

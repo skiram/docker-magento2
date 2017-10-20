@@ -13,3 +13,7 @@ services:
       - fpm
     ports:
       - 8080:80
+  varnish:
+    build: ./varnish
+    ports:
+      - 8092:80
