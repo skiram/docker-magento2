@@ -5,8 +5,6 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 COPY entrypoint.sh /usr/local/bin/entrypoint
-#COPY crontab /etc/cron.d/magento-cron
-#RUN chmod 0644 /etc/cron.d/magento-cron
 RUN touch /var/log/cron.log
 
 ENV MAGE_ROOT /var/www/html

@@ -12,6 +12,7 @@ RUN curl -o /tmp/composer-setup.php https://getcomposer.org/installer \
     && php -r "if (hash('SHA384', file_get_contents('/tmp/composer-setup.php')) !== trim(file_get_contents('/tmp/composer-setup.sig'))) { unlink('/tmp/composer-setup.php'); echo 'Invalid installer' . PHP_EOL; exit(1); }" \
     && php /tmp/composer-setup.php --no-ansi --install-dir=/usr/local/bin --filename=composer --version=${COMPOSER_VERSION} && rm -rf /tmp/composer-setup.php
 
+# Download and compile icu for intl install
 RUN curl -sS -o /tmp/icu.tar.gz -L http://download.icu-project.org/files/icu4c/59.1/icu4c-59_1-src.tgz \
   && tar -zxf /tmp/icu.tar.gz -C /tmp \
   && cd /tmp/icu/source \
@@ -24,12 +25,14 @@ RUN apt-get update \
   && apt-get install -y libpng12-dev libjpeg-dev libpq-dev libmcrypt-dev libxml2-dev libxslt1-dev libfreetype6-dev \
   && rm -rf /var/lib/apt/lists/*
 
+# Required for intl install
 ENV PHP_CPPFLAGS="$PHP_CPPFLAGS -std=c++11"
 
 RUN docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr --with-freetype-dir=/usr/ \
     && docker-php-ext-configure intl --with-icu-dir=/usr/local \
     && docker-php-ext-install intl mcrypt gd opcache pdo pdo_mysql zip soap mbstring xsl
 
+# User Docker for permission managment
 RUN useradd docker \
     && mkdir -p /home/docker/.composer \
     && chown -R docker:docker /home/docker
