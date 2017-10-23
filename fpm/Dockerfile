@@ -29,8 +29,27 @@ RUN docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr --with-
     && docker-php-ext-configure intl --with-icu-dir=/usr/local \
     && docker-php-ext-install intl mcrypt gd opcache pdo pdo_mysql zip soap mbstring xsl
 
+RUN pecl install -o -f xdebug \
+    && rm -rf /tmp/pear \
+    && { \
+        echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)"; \
+        echo "xdebug.remote_enable=1"; \
+        echo "xdebug.profiler_enable_trigger=1"; \
+        echo "xdebug.profiler_output_dir=/tmp/xdebug"; \
+        echo "xdebug.trace_enable_trigger=1"; \
+        echo "xdebug.trace_output_dir=/tmp/xdebug"; \
+    } > /usr/local/etc/php/conf.d/ext-xdebug.ini.disabled \
+    && mkdir /tmp/xdebug \
+    && chmod 777 /tmp/xdebug
+
+ENV XDEBUG_ENABLED false
+
 RUN useradd docker \
     && mkdir -p /home/docker/.composer \
     && chown -R docker:docker /home/docker
 
+RUN chmod -R 777 /usr/local/etc/php/conf.d/
+
 WORKDIR /var/www/html
+
+COPY entrypoint.sh /usr/local/bin/docker-php-entrypoint
