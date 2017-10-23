@@ -47,6 +47,12 @@ RUN pecl install -o -f xdebug \
 
 ENV XDEBUG_ENABLED false
 
+RUN apt-get update \
+    && apt-get -y install libmagickwand-dev --no-install-recommends \
+    && pecl install imagick \
+    && docker-php-ext-enable imagick \
+    && rm -r /var/lib/apt/lists/*
+
 # User Docker for permission managment
 RUN useradd docker \
     && mkdir -p /home/docker/.composer \

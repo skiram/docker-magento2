@@ -32,6 +32,12 @@ RUN docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr --with-
     && docker-php-ext-configure intl --with-icu-dir=/usr/local \
     && docker-php-ext-install intl mcrypt gd opcache pdo pdo_mysql zip soap mbstring xsl
 
+RUN apt-get update \
+    && apt-get -y install libmagickwand-dev --no-install-recommends \
+    && pecl install imagick \
+    && docker-php-ext-enable imagick \
+    && rm -r /var/lib/apt/lists/*
+
 # User Docker for permission managment
 RUN useradd docker \
     && mkdir -p /home/docker/.composer \
