@@ -9,3 +9,4 @@ This repository contains a complete stack for Magento 2.
 * Nginx 1.9
 * Varnish 4
 * Redis 4
+* Node 6 (for SASS support)

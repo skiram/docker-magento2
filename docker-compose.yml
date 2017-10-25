@@ -21,3 +21,8 @@ services:
     build: ./varnish
     ports:
       - 8092:80
+  node:
+    build: ./node
+    user: docker
+    volumes:
+      - .:/home/docker/app
