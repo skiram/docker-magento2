@@ -43,4 +43,8 @@ RUN useradd docker \
     && mkdir -p /home/docker/.composer \
     && chown -R docker:docker /home/docker
 
+RUN apt-get update \
+    && apt-get -y install mysql-client \
+    && rm -r /var/lib/apt/lists/*
+
 WORKDIR /var/www/html
