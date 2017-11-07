@@ -14,6 +14,10 @@ acl purge {
     "!ACL_PURGE!";
 }
 
+acl profile {
+   "!BLACKFIRE_AUTH_IP!";
+}
+
 sub vcl_recv {
     if (req.method == "PURGE") {
         if (client.ip !~ purge) {
@@ -32,6 +36,20 @@ sub vcl_recv {
           ban("obj.http.X-Pool ~ " + req.http.X-Pool);
         }
         return (synth(200, "Purged"));
+    }
+
+    if (req.http.X-Blackfire-Query && client.ip ~ profile) {
+        if (req.esi_level > 0) {
+            # ESI request should not be included in the profile.
+            # Instead you should profile them separately, each one
+            # in their dedicated profile.
+            # Removing the Blackfire header avoids to trigger the profiling.
+            # Not returning let it go trough your usual workflow as a regular
+            # ESI request without distinction.
+            unset req.http.X-Blackfire-Query;
+        } else {
+            return (pass);
+        }
     }
 
     if (req.method != "GET" &&
