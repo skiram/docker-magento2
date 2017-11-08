@@ -14,10 +14,6 @@ acl purge {
     "!ACL_PURGE!";
 }
 
-acl profile {
-   "!BLACKFIRE_AUTH_IP!";
-}
-
 sub vcl_recv {
     if (req.method == "PURGE") {
         if (client.ip !~ purge) {
@@ -38,7 +34,7 @@ sub vcl_recv {
         return (synth(200, "Purged"));
     }
 
-    if (req.http.X-Blackfire-Query && client.ip ~ profile) {
+    if (req.http.X-Blackfire-Query) {
         if (req.esi_level > 0) {
             # ESI request should not be included in the profile.
             # Instead you should profile them separately, each one
