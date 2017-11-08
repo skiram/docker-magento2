@@ -13,6 +13,7 @@ COPY start.sh /start.sh
 ENV BACKEND_HOST nginx
 ENV BACKEND_PORT 80
 ENV ACL_PURGE fpm
+ENV LISTEN_PORT 80
 
 ENTRYPOINT ["/usr/local/bin/docker-environment"]
 CMD ["/start.sh"]
