@@ -5,6 +5,8 @@ VHOST_FILE="/etc/nginx/conf.d/default.conf"
 [ ! -z "${FPM_HOST}" ] && sed -i "s/!FPM_HOST!/${FPM_HOST}/" $VHOST_FILE
 [ ! -z "${FPM_PORT}" ] && sed -i "s/!FPM_PORT!/${FPM_PORT}/" $VHOST_FILE
 [ ! -z "${APP_ROOT}" ] && sed -i "s#!APP_ROOT!#${APP_ROOT}#" $VHOST_FILE
+[ ! -z "${VARNISH_HOST}" ] && sed -i "s#!VARNISH_HOST!#${VARNISH_HOST}#" $VHOST_FILE
+[ ! -z "${VARNISH_PORT}" ] && sed -i "s#!VARNISH_PORT!#${VARNISH_PORT}#" $VHOST_FILE
 
 nginx -t
 
