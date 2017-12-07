@@ -54,4 +54,22 @@ RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
     && mv /tmp/blackfire-*.so $(php -r "echo ini_get('extension_dir');")/blackfire.so \
     && printf "extension=blackfire.so\nblackfire.agent_socket=tcp://blackfire:8707\n" > $PHP_INI_DIR/conf.d/blackfire.ini
 
+# XDEBUG Install
+RUN pecl install -o -f xdebug \
+    && rm -rf /tmp/pear \
+    && { \
+        echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)"; \
+        echo "xdebug.remote_enable=1"; \
+        echo "xdebug.profiler_enable_trigger=1"; \
+        echo "xdebug.profiler_output_dir=/tmp/xdebug"; \
+        echo "xdebug.trace_enable_trigger=1"; \
+        echo "xdebug.trace_output_dir=/tmp/xdebug"; \
+    } > /usr/local/etc/php/conf.d/ext-xdebug.ini.disabled \
+    && mkdir /tmp/xdebug \
+    && chmod 777 /tmp/xdebug
+
+RUN chmod -R 777 /usr/local/etc/php/conf.d/
+
 WORKDIR /var/www/html
+
+COPY entrypoint.sh /usr/local/bin/docker-php-entrypoint
