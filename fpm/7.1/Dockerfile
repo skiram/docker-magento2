@@ -46,7 +46,8 @@ RUN docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr --with-
         zip \
         soap \
         mbstring \
-        xsl
+        xsl \
+        bcmath
 
 # XDEBUG Install
 RUN pecl install -o -f xdebug \
