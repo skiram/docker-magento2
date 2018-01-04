@@ -13,15 +13,22 @@ RUN curl -o /tmp/composer-setup.php https://getcomposer.org/installer \
 
 # Download and compile icu for intl install
 RUN curl -sS -o /tmp/icu.tar.gz -L http://download.icu-project.org/files/icu4c/59.1/icu4c-59_1-src.tgz \
-  && tar -zxf /tmp/icu.tar.gz -C /tmp \
-  && cd /tmp/icu/source \
-  && ./configure --prefix=/usr/local \
-  && make \
-  && make install \
-  && rm -rf /tmp/icu*
+    && tar -zxf /tmp/icu.tar.gz -C /tmp \
+    && cd /tmp/icu/source \
+    && ./configure --prefix=/usr/local \
+    && make \
+    && make install \
+    && rm -rf /tmp/icu*
 
 RUN apt-get update \
-  && apt-get install -y libpng12-dev libjpeg-dev libpq-dev libmcrypt-dev libxml2-dev libxslt1-dev libfreetype6-dev \
+    && apt-get install -y \
+        libpng12-dev \
+        libjpeg-dev \
+        libpq-dev \
+        libmcrypt-dev \
+        libxml2-dev \
+        libxslt1-dev \
+        libfreetype6-dev \
   && rm -rf /var/lib/apt/lists/*
 
 # Required for intl install
@@ -29,7 +36,17 @@ ENV PHP_CPPFLAGS="$PHP_CPPFLAGS -std=c++11"
 
 RUN docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr --with-freetype-dir=/usr/ \
     && docker-php-ext-configure intl --with-icu-dir=/usr/local \
-    && docker-php-ext-install intl mcrypt gd opcache pdo pdo_mysql zip soap mbstring xsl
+    && docker-php-ext-install \
+        intl \
+        mcrypt \
+        gd \
+        opcache \
+        pdo \
+        pdo_mysql \
+        zip \
+        soap \
+        mbstring \
+        xsl
 
 # XDEBUG Install
 RUN pecl install -o -f xdebug \
