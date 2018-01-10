@@ -30,8 +30,9 @@ RUN apt-get update \
         libxml2-dev \
         libxslt1-dev \
         libfreetype6-dev \
+        sudo \
         mysql-client \
-  && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
 # Required for intl install
 ENV PHP_CPPFLAGS="$PHP_CPPFLAGS -std=c++11"
@@ -83,9 +84,10 @@ RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
 # User Docker for permission managment
 RUN useradd docker \
     && mkdir -p /home/docker/.composer \
-    && chown -R docker:docker /home/docker
-
-RUN chmod -R 777 /usr/local/etc/php/conf.d/
+    && usermod --append --groups sudo docker \
+    && chown -R docker:docker /home/docker \
+    && echo 'ALL ALL = (ALL) NOPASSWD: ALL' >> /etc/sudoers \
+    && echo 'docker:secret' | chpasswd
 
 WORKDIR /var/www/html
 

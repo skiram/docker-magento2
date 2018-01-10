@@ -6,11 +6,11 @@ XDEBUG_INI_FILE_DIS="${XDEBUG_INI_FILE}.disabled"
 
 if [ "$XDEBUG_ENABLED" = "true" ]; then
     if [ -f "$XDEBUG_INI_FILE_DIS" ]; then
-        mv $XDEBUG_INI_FILE_DIS $XDEBUG_INI_FILE
+        sudo mv $XDEBUG_INI_FILE_DIS $XDEBUG_INI_FILE
     fi
 else
     if [ -f "$XDEBUG_INI_FILE" ]; then
-        mv $XDEBUG_INI_FILE $XDEBUG_INI_FILE_DIS
+        sudo mv $XDEBUG_INI_FILE $XDEBUG_INI_FILE_DIS
     fi
 fi
 
