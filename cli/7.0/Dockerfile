@@ -14,37 +14,64 @@ RUN curl -o /tmp/composer-setup.php https://getcomposer.org/installer \
 
 # Download and compile icu for intl install
 RUN curl -sS -o /tmp/icu.tar.gz -L http://download.icu-project.org/files/icu4c/59.1/icu4c-59_1-src.tgz \
-  && tar -zxf /tmp/icu.tar.gz -C /tmp \
-  && cd /tmp/icu/source \
-  && ./configure --prefix=/usr/local \
-  && make \
-  && make install \
-  && rm -rf /tmp/icu*
+    && tar -zxf /tmp/icu.tar.gz -C /tmp \
+    && cd /tmp/icu/source \
+    && ./configure --prefix=/usr/local \
+    && make \
+    && make install \
+    && rm -rf /tmp/icu*
 
 RUN apt-get update \
-  && apt-get install -y libpng12-dev libjpeg-dev libpq-dev libmcrypt-dev libxml2-dev libxslt1-dev libfreetype6-dev \
-  && rm -rf /var/lib/apt/lists/*
+    && apt-get install -y \
+        libpng12-dev \
+        libjpeg-dev \
+        libpq-dev \
+        libmcrypt-dev \
+        libxml2-dev \
+        libxslt1-dev \
+        libfreetype6-dev \
+        sudo \
+        mysql-client \
+    && rm -rf /var/lib/apt/lists/*
 
 # Required for intl install
 ENV PHP_CPPFLAGS="$PHP_CPPFLAGS -std=c++11"
 
 RUN docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr --with-freetype-dir=/usr/ \
     && docker-php-ext-configure intl --with-icu-dir=/usr/local \
-    && docker-php-ext-install intl mcrypt gd opcache pdo pdo_mysql zip soap mbstring xsl
+    && docker-php-ext-install \
+        intl \
+        mcrypt \
+        gd \
+        opcache \
+        pdo \
+        pdo_mysql \
+        zip \
+        soap \
+        mbstring \
+        xsl \
+        bcmath
+
+# XDEBUG Install
+RUN pecl install -o -f xdebug \
+    && rm -rf /tmp/pear \
+    && { \
+        echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)"; \
+        echo "xdebug.remote_enable=1"; \
+        echo "xdebug.profiler_enable_trigger=1"; \
+        echo "xdebug.profiler_output_dir=/tmp/xdebug"; \
+        echo "xdebug.trace_enable_trigger=1"; \
+        echo "xdebug.trace_output_dir=/tmp/xdebug"; \
+    } > /usr/local/etc/php/conf.d/ext-xdebug.ini.disabled \
+    && mkdir /tmp/xdebug \
+    && chmod 777 /tmp/xdebug
+
+ENV XDEBUG_ENABLED false
 
 RUN apt-get update \
     && apt-get -y install libmagickwand-dev --no-install-recommends \
     && pecl install imagick \
     && docker-php-ext-enable imagick \
-    && rm -r /var/lib/apt/lists/*
-
-# User Docker for permission managment
-RUN useradd docker \
-    && mkdir -p /home/docker/.composer \
-    && chown -R docker:docker /home/docker
-
-RUN apt-get update \
-    && apt-get -y install mysql-client \
     && rm -r /var/lib/apt/lists/*
 
 # Blackfire Install
@@ -54,4 +81,14 @@ RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
     && mv /tmp/blackfire-*.so $(php -r "echo ini_get('extension_dir');")/blackfire.so \
     && printf "extension=blackfire.so\nblackfire.agent_socket=tcp://blackfire:8707\n" > $PHP_INI_DIR/conf.d/blackfire.ini
 
+# User Docker for permission managment
+RUN useradd docker \
+    && mkdir -p /home/docker/.composer \
+    && usermod --append --groups sudo docker \
+    && chown -R docker:docker /home/docker \
+    && echo 'ALL ALL = (ALL) NOPASSWD: ALL' >> /etc/sudoers \
+    && echo 'docker:secret' | chpasswd
+
 WORKDIR /var/www/html
+
+COPY entrypoint.sh /usr/local/bin/docker-php-entrypoint
