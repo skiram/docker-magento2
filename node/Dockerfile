@@ -1,4 +1,4 @@
-FROM node:6
+FROM node:9
 
 RUN npm install -g gulp-cli grunt-cli eslint
 
