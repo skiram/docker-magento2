@@ -30,6 +30,8 @@ RUN apt-get update \
         libxslt1-dev \
         libfreetype6-dev \
         sudo \
+        mysql-client \
+        git \
     && rm -rf /var/lib/apt/lists/*
 
 # Required for intl install
