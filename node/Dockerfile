@@ -1,4 +1,4 @@
-FROM node:9
+FROM node:11.3.0
 
 RUN npm install -g gulp-cli grunt-cli eslint
 

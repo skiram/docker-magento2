@@ -1,7 +1,7 @@
-vcl 4.0;
+vcl 6.0.5;
 
 import std;
-# The minimal Varnish version is 4.0
+# The minimal Varnish version is 6.0.5
 # For SSL offloading, pass the following header in your proxy server or load balancer: 'X-Forwarded-Proto: https'
 
 backend default {
