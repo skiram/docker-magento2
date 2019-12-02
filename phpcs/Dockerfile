@@ -1,4 +1,4 @@
-FROM composer:1.5
+FROM composer:1.9.1
 
 ARG M2_USERNAME
 ARG M2_PASSWORD
