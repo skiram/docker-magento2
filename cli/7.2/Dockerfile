@@ -8,12 +8,9 @@ ENV COMPOSER_ALLOW_SUPERUSER 1
 ENV COMPOSER_VERSION 1.9.1
 
 RUN curl -s -f -L -o /tmp/composer-setup.php https://getcomposer.org/installer \
- && php -r " \
+    && php -r " \
     \$signature = 'a5c698ffe4b8e849a443b120cd5ba38043260d5c4023dbf93e1558871f1f07f58274fc6f4c93bcfd858c6bd0775cd8d1'; \
     if (hash('SHA384', file_get_contents('/tmp/composer-setup.php')) !== \$signature) { unlink('/tmp/composer-setup.php'); echo 'Invalid installer' . PHP_EOL; exit(1); }" \
-    && php /tmp/installer.php --no-ansi --install-dir=/usr/bin --filename=composer --version=${COMPOSER_VERSION} \
-    && composer --ansi --version --no-interaction \
-    && rm -rf /tmp/* /tmp/.htaccess
     && php /tmp/composer-setup.php --no-ansi --install-dir=/usr/bin --filename=composer --version=${COMPOSER_VERSION} \
     && composer --ansi --version --no-interaction \
     && rm -rf /tmp/* /tmp/.htaccess
@@ -49,7 +46,6 @@ RUN docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr --with-
     && docker-php-ext-configure intl --with-icu-dir=/usr/local \
     && docker-php-ext-install \
         intl \
-        mcrypt \
         gd \
         opcache \
         pdo \
@@ -59,6 +55,14 @@ RUN docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr --with-
         mbstring \
         xsl \
         bcmath
+
+# User Docker for permission managment
+RUN useradd docker \
+    && mkdir -p /home/docker/.composer \
+    && usermod --append --groups sudo docker \
+    && chown -R docker:docker /home/docker \
+    && echo 'ALL ALL = (ALL) NOPASSWD: ALL' >> /etc/sudoers \
+    && echo 'docker:secret' | chpasswd
 
 # XDEBUG Install
 RUN pecl install -o -f xdebug \
@@ -88,14 +92,6 @@ RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
     && tar zxpf /tmp/blackfire-probe.tar.gz -C /tmp \
     && mv /tmp/blackfire-*.so $(php -r "echo ini_get('extension_dir');")/blackfire.so \
     && printf "extension=blackfire.so\nblackfire.agent_socket=tcp://blackfire:8707\n" > $PHP_INI_DIR/conf.d/blackfire.ini
-
-# User Docker for permission managment
-RUN useradd docker \
-    && mkdir -p /home/docker/.composer \
-    && usermod --append --groups sudo docker \
-    && chown -R docker:docker /home/docker \
-    && echo 'ALL ALL = (ALL) NOPASSWD: ALL' >> /etc/sudoers \
-    && echo 'docker:secret' | chpasswd
 
 WORKDIR /var/www/html
 
